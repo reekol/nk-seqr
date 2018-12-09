@@ -1,8 +1,8 @@
 <?php 
 
 /** 
-    Depends on zbar-tools and qrencode
-    To install$ apt-get install zbar-tools qrencode
+    Depends on zbar-tools and qrencode wamerican
+    To install$ apt-get install zbar-tools qrencode wamerican
 **/
 
 include('../php/init.php'); /// Settings and globals
@@ -54,7 +54,7 @@ if(!isset($OUT['err'])){
         Generating randomness
     **/
         sleep(1);
-        $OUT['pwd'] = trim($_REQUEST['rand'] === 'word' ? `shuf -n 1 assets/words.txt` : bin2hex(random_bytes(4)));
+        $OUT['pwd'] = trim($_REQUEST['rand'] === 'word' ? `shuf -n 1 /usr/share/dict/words` : bin2hex(random_bytes(4)));
     }
 }
 
