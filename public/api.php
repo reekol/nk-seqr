@@ -1,7 +1,7 @@
 <?php 
 
 /** 
-    Depends on zbar-tools qrencode
+    Depends on zbar-tools and qrencode
     To install$ apt-get install zbar-tools qrencode
 **/
 
@@ -23,7 +23,7 @@ if(!isset($OUT['err'])){
             "uid" => $data['uid'],
             "nme"=>$data['meta'][0],
             "svg" => generateQr($data['content'], (int) $_REQUEST['correction'], (int) $_REQUEST['margin']),
-//            "rec" => $data['salt']
+            "rec" => $data['salt']
         ];
 
     }else if(isset($_FILES["fileToUpload"])){
