@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>SeQR link</title>
+    <link rel="shortcut icon" href="assets/favicon.ico" />
+
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/styles.css" crossorigin="anonymous">
+
+
+    <script src="//code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="//stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script src="js/scripts.js"></script>
+  </head>
+  <body class='' background="assets/bg.png">
+  <div class="container  col-xl-4 col-lg-6 col-md-9 col-sm-12 pt-2 resizable" >
+    <div class="tab-content pt-3" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <div class="card shadow text-white bg-danger mb-3"  >
+                <div class="card-body px-3 py-2">
+                    <input id="username" style="display:none"   type="text" name="fakeusernameremembered">
+                    <input id="password" style="display:none"   type="password" name="fakepasswordremembered">
+                    <div class="input-group" >
+                        <div class="input-group-prepend">
+                            <span class="input-group-text p-0">&nbsp;</span>
+                        </div>
+                        <input id='fp' class="form-control custom-transparent" type="password" autocomplete="new-password"  placeholder="Password" value="" data-toggle="tooltip" data-html="true" title1="Type your password. Press <b>Tab</b> to create new message or press <b>Enter</b> to upload Qr image for decryption." />
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" id="passDefault"><i class="fas fa-list"></i></button>
+                            <button class="btn btn-secondary" id="passRandom"><i class="fas fa-dice-five"></i></button>
+                            <button class="btn btn-secondary" id="togglePassVis"><i id="fpEye" class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                <div class="">
+                    <div id="err"></div>
+                    <div id="uid"></div>
+                    <div id="rec"></div>
+                </div>
+
+                </div>
+                <a href="" id="qrSvg" download="" style='width:100%;text-align:center' ></a>
+            </div>
+            <div class="card shadow border-light mb-3 requireHide" >
+                <form method=post enctype="multipart/form-data" id='ocrup' onsubmit="return formSubmit(this)">
+                    <input type="hidden" name="CSRF" value="" />
+                    <input type="hidden" class="pass" name="p" />
+                    <div class="card-header px-3 py-2">
+                        <div class="input-group m-0 p-0">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text p-0">&nbsp;</span>
+                            </div>
+                            <input id='n' class="form-control"  name='n' autocomplete="off" placeholder="Note name ..." value=""  data-toggle="tooltip" data-html="true" title="Used as a filename for generated QR code. Leave empty for default."/>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-secondary" onmousedown="$('#boxSettings').toggle('slow')"><i class="fas fa-cogs"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body px-3 py-1" id="boxSettings">
+                        <small style="color:#495057">Correction&nbsp;level</small>
+                        <input name="correction" class="range" type="range" autocomplete="off" value="2" min="1" max="4"/>
+                        <small style="color:#495057">Border&nbsp;size</small>
+                        <input name="margin"     class="range" type="range" autocomplete="off" value="2" min="1" max="4"/>
+                    </div>
+                    <div class="card-body px-3 py-2">
+                            <div class="input-group wallpapered">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text p-0">&nbsp;</span>
+                                </div>
+                                <div class="background" id="count_message">.</div>
+                                <textarea  id="newNote" rows=7 class="form-control" rows="3" name='t' placeholder="Note text ..." ></textarea>
+                            </div>
+                            <div class="btn-group mt-1 col-12 p-0 mx-0" role="group" aria-label="">
+                                <button type="submit" class="btn btn-secondary col-8"><i class="fas fa-qrcode"></i></button>
+                                <button type="button" class="col-2 btn btn-secondary" id="eraser"><i class="fas fa-eraser"></i></button>
+                                <button type="button" class="col-2 btn btn-secondary" id="newNoteCheck" ><i id="nnEye" class="fas fa-eye"></i></button>
+                            </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card shadow border-light mb-3 requireHide" id="fupCard" >
+                <form method="post" enctype="multipart/form-data" id="fup" >
+                    <div class="card-header px-3 py-2">
+                    <div class="row">
+                        <div class="input-group mx-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text p-0">&nbsp;</span>
+                            </div>
+                            <select  name="action" class="text-danger custom-select custom-transparent">
+                                <option value="0" selected >Read QR</option>
+                                <option value="1"  >Read and Invalidate QR</option>
+                            </select>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#cameraModal"><span class="fas fa-camera-retro"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="card-body px-3 py-2">
+                        <input type="hidden" name="CSRF" value="" />
+                        <input type="hidden" name="MAX_FILE_SIZE" value="9194304" /> 
+                        <input type="hidden" class="pass" name="p"  value="" />
+                        <input type="hidden" name="camFile"  id="camFile"  value="" />
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text p-0">&nbsp;</span>
+                            </div>
+
+                            <div class="custom-file col-12">
+                                <input accept="image/*;capture=camera" type="file" class="custom-file-input custom-transparent" id="customFile" name="fileToUpload"  >
+                                <label class="custom-file-label" for="customFile">Choose or Drop file</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="form-area">  
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control shadow mb-3" id="name" name="name" placeholder="Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control shadow mb-3" id="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control shadow mb-3" id="mobile" name="mobile" placeholder="Mobile Number" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control shadow mb-3" id="subject" name="subject" placeholder="Subject" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control shadow mb-3" type="textarea" id="message" placeholder="Message" maxlength="140" rows="7"></textarea>
+                        <span class="help-block"><p id="characterLeft" class="help-block ">You have reached the limit</p></span>
+                    </div>
+                    <button type="button" id="submit" name="submit" class="col-12 btn btn-secondary shadow mb-3">Submit Form</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <ul class="nav nav-tabs mb-5" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Quick Response</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contacts</a>
+        </li>
+    </ul>
+  </div>
+  <div class="modal" tabindex="-1" role="dialog" id="cameraModal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content bg-dark text-white">
+        <div class="modal-header border-0">
+            <select class="col-8 float-left form-control" id="camSelect"></select>
+            <button type="button" id="camStop" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body px-0 pt-0">
+            <div class="container px-0">
+                <video id="camVideo" class="col-12 px-0 close" autoplay playsinline data-dismiss="modal"></video>
+                <canvas id="camCanvas"></canvas>
+            </div>
+        </div>
+        </div>
+    </div>
+  </div>
+  </body>
+</html>

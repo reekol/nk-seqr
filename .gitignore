@@ -1,0 +1,9 @@
+# exclude everything
+salts/*
+crt/certificate.pem
+crt/key.pem
+access.log
+error.log
+
+# exception to the rule
+!salts/.gitkeep
