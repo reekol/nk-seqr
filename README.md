@@ -2,3 +2,8 @@
 https://seqr.link 
 #### Attention: it uses a self signed certifcate.
 
+### To install dependencies
+
+```
+apt-get install zbar-tools qrencode wamerican
+```
