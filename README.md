@@ -7,3 +7,6 @@ https://seqr.link
 ```bash
 apt-get install zbar-tools qrencode wamerican
 ```
+### Default credentials
+
+- Basic auth: admin/admn123
