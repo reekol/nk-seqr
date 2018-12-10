@@ -1,0 +1,4 @@
+AuthUserFile /var/www/html/seqr.link/public/.htpasswd
+AuthType Basic
+AuthName "SeQR login"
+Require valid-user

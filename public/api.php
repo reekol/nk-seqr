@@ -55,6 +55,11 @@ if(!isset($OUT['err'])){
     **/
         sleep(1);
         $OUT['pwd'] = trim($_REQUEST['rand'] === 'word' ? `shuf -n 1 /usr/share/dict/words` : bin2hex(random_bytes(4)));
+    }else if(isset($_REQUEST['doc'])){
+    /**
+        GETTING README.md
+    **/
+        $OUT['readme'] = file_get_contents('./../README.md');
     }
 }
 
