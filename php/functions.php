@@ -71,7 +71,7 @@ function setQrData(string $pwd,array $meta,string $text,$writeCode = false){
     return [
             'uid'       => $uid,
             'meta'      => explode(',',$meta),
-            'content'   => $uid.' '.$secure->encode($toEnrypt,$secret),
+            'content'   => $secure->encode($uid,$pwd).' '.$secure->encode($toEnrypt,$secret),
             'salt'      => $salt
         ];
 }
@@ -81,7 +81,7 @@ function getQrData(string $pwd,string $raw){
         $err = 0;
         $name = $text = $content = null;
         $qrtext = explode(' ',$raw);
-        $uid = $qrtext[0];
+        $uid = $secure->decode($qrtext[0],$pwd);
         $salt = (current(explode(":",$pwd)) === 'RAW' ? '' : getRegisteredSalt($uid));
         if($salt === false){
             $err = 2; // Unrekognized QR for this system.
