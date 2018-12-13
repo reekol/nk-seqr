@@ -60,6 +60,10 @@ if(!isset($OUT['err'])){
         GETTING README.md
     **/
         $OUT['readme'] = file_get_contents('./../README.md');
+    }else if(isset($_REQUEST['return']) && $_REQUEST['return'] === 'ip'){
+        $OUT['res'] = $_SERVER['REMOTE_ADDR'];
+    }else if(isset($_REQUEST['return']) && $_REQUEST['return'] === 'server'){
+        $OUT['res'] = getallheaders();
     }
 }
 
