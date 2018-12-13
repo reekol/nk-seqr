@@ -4,6 +4,7 @@ crt/certificate.pem
 crt/key.pem
 access.log
 error.log
+public/.htpasswd
 
 # exception to the rule
 !salts/.gitkeep
