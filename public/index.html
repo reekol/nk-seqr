@@ -124,6 +124,7 @@
             <script>
             let markdown = (md) => {
                 return ("\n" + md)
+                        .replace(/\ https:\/\/(.*)\n/g,'&nbsp<a href="//$1">$1</a>\n')
                         .replace(/\n###(.*?)\n/g,'\n<h6>$1</h6>\n')
                         .replace(/\n##(.*?)\n/g,'\n<h4>$1</h4>\n')
                         .replace(/\n#(.*?)\n/g,'\n<h1>$1</h1>\n')
