@@ -2,7 +2,7 @@
 
 /** 
     Depends on zbar-tools and qrencode wamerican
-    To install$ apt-get install zbar-tools qrencode wamerican
+    To install$ apt-get install zbar-tools qrencode wamerican imagemagick
 **/
 
 include('../php/init.php'); /// Settings and globals

@@ -39,12 +39,6 @@ function unregisterSalt($uid){
 }
 
 
-function scaleImage($imagePath) {
-    $imagick = new \Imagick(realpath($imagePath));
-    $imagick->scaleImage(500, 500, true);
-    file_put_contents($imagePath,$imagick->getImageBlob());
-}
-
 function setQrData(string $pwd,array $meta,string $text,$writeCode = false){
     // Anatomy of seqr
     // A- UUID - Unencrypted
@@ -117,12 +111,12 @@ function processIncomingFile(string $uploadField,string $alternateField){
 
 
 function zbarImg($file){
-    scaleImage($file);
     $cmd = 'zbarimg --raw -q '.$file;
     return trim(exec($cmd,$resArr));
 }
 
 function qrOcr($file){
+    `mogrify -rotate "360" -resize 500x500 $file`; //recreate ( rotate 360 degree ) and resize image ( preventscode injection )
     $check = getimagesize($file);
     if(!$check) return false;
     return zbarImg($file);
