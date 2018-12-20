@@ -116,7 +116,7 @@ function zbarImg($file){
 }
 
 function qrOcr($file){
-    `mogrify -rotate "360" -resize 500x500 $file`; //recreate ( rotate 360 degree ) and resize image ( preventscode injection )
+    `mogrify -rotate "360" -resize 500x500 $file`; //recreate ( rotate 360 degree ) and resize image ( prevent code injection )
     $check = getimagesize($file);
     if(!$check) return false;
     return zbarImg($file);
