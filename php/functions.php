@@ -41,7 +41,7 @@ function unregisterSalt($uid){
 
 function setQrData(string $pwd,array $meta,string $text,$writeCode = false){
     // Anatomy of seqr
-    // A- UUID - Unencrypted
+    // A- UUID - Uncrypted
     // B- Encrypted block  -\========================== 
     //   1).................| Hash of -\
     //   2).................|          |-> Meta [name,limit,remote,etc]
