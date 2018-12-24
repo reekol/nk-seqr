@@ -2,7 +2,7 @@
 
 /** 
     Depends on zbar-tools and qrencode wamerican
-    To install$ apt-get install zbar-tools qrencode wamerican imagemagick
+    To install$ apt-get install zbar-tools qrencode wamerican imagemagick oathool
 **/
 
 include('../php/init.php'); /// Settings and globals
@@ -53,8 +53,22 @@ if(!isset($OUT['err'])){
     /**
         Generating randomness
     **/
+        $rend = trim($_REQUEST['rand']);
         sleep(1);
-        $OUT['pwd'] = trim($_REQUEST['rand'] === 'word' ? `shuf -n 1 /usr/share/dict/words` : bin2hex(random_bytes(4)));
+             if($_REQUEST['rand'] === 'word') $OUT['pwd'] = `shuf -n 1 /usr/share/dict/words`;
+        else if($_REQUEST['rand'] === 'hash') $OUT['pwd'] = bin2hex(random_bytes(4));
+        else if($_REQUEST['rand'] === 'totp'){
+            $seed = bin2hex(random_bytes(15));
+            $secret = trim(`oathtool --totp -v $seed | grep Base32 | cut -d ' ' -f3`);
+            $OUT['pwd'] = 'totp:'.$seed;
+            $OUT['svg'] = generateQr("otpauth://totp/secret@seqr.link?secret={$secret}");
+        }
+        else if($_REQUEST['rand'] === 'hotp'){
+            $seed = bin2hex(random_bytes(15));
+            $secret = trim(`oathtool --hotp -v $seed | grep Base32 | cut -d ' ' -f3`);
+            $OUT['pwd'] = 'hotp:'.$seed;
+            $OUT['svg'] = generateQr("otpauth://hotp/secret@seqr.link?secret={$secret}");
+        }
     }else if(isset($_REQUEST['doc'])){
     /**
         GETTING README.md

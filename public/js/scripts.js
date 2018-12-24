@@ -1,4 +1,4 @@
-var textMax = suffix = pr = pd = fp = nn = nc = cm = cf = fu = mf = er = hash = n = null;
+var textMax = suffix = pr = totp = hotp = pd = fp = nn = nc = cm = cf = fu = mf = er = hash = n = null;
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -119,6 +119,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     mf = document.getElementById('camFile');
     tp = document.getElementById('togglePassVis');
     er = document.getElementById('eraser');
+    totp = document.getElementById('passTotp');
+    hotp = document.getElementById('passHotp');
 
     let res = await fetch('api.php')
         res = await res.json()
@@ -154,9 +156,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     fp.addEventListener('keyup',passUp);
 
     pd.addEventListener('click',(e) => { fp.value = 'RAW:default'; passUp() });
-    pr.addEventListener('click',async (e) => { 
+    pr.addEventListener('click',(e) => { getpass('word') });
+    totp.addEventListener('click',(e) => { getpass('totp') });
+    hotp.addEventListener('click',(e) => { getpass('hotp') });
+
+    var getpass = async (type) => {
         loading('start')
-        fp.value = await strRand();
+        fp.value = await strRand(type);
         loading('end')
         passUp()
         let x = document.getElementById('fp');
@@ -166,12 +172,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         y.classList.add('fa-eye-slash')
         fp.select();
         document.execCommand('copy');
-    });
+    }
 
-    var strRand = async () => {
-         let res = await fetch('api.php?rand=word')
+    var strRand = async (type = 'hash') => {
+         let res = await fetch('api.php?rand=' + type)
              res = await res.json()
              setCsrf(res.csrf)
+         if(typeof res.svg !== 'undefined') document.getElementById('qrSvg').innerHTML = ""
+             + "<div class='alert alert-info m-0' >" + type + "</div>" 
+             + res.svg
+             + "<div class='alert alert-info' >Scan this code with Authentiation App!</div>";
         return res.pwd;
             let text = "";
             let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -290,7 +300,8 @@ function setLimit(limit){
 }
 
 function loading(mode = 'start'){
-        document.getElementById('qrSvg').innerHTML = (mode == 'start'? '<div class="lds-ripple mt-2"><div></div><div></div></div>': '')
+        let content = document.getElementById('qrSvg').innerHTML;
+        document.getElementById('qrSvg').innerHTML = (mode == 'start'? '<div class="lds-ripple mt-2"><div></div><div></div></div>': content)
 }
 
 function formSubmit(form){
