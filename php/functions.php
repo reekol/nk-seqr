@@ -16,8 +16,18 @@ function getRegisteredSalt($uid,$full = false){
     }
 }
 
-function registerSalt($uid){
-    $token = bin2hex(random_bytes(16));
+function getDatForUid($uid,$key){
+    $file = './../salts/uid-'.$uid.'.php';
+    if(file_exists($file)){
+        $res = include($file);
+        return $res[$key];
+    }else{
+        return false;
+    }
+}
+
+function registerSalt($uid,$token = null){
+    if($token === null) $token = bin2hex(random_bytes(16));
     file_put_contents('./../salts/uid-'.$uid.'.php','<?php return '.var_export(['token' => $token,'stats' => []],true).';');
     return $token;
 }
@@ -25,7 +35,7 @@ function registerSalt($uid){
 function addDatToSalt($uid,$key,$val){
     $token = '';
     if(file_exists('./../salts/uid-'.$uid.'.php')){
-        $res = require_once('./../salts/uid-'.$uid.'.php');
+        $res = require('./../salts/uid-'.$uid.'.php');
         $res[$key] = $val;
         file_put_contents('./../salts/uid-'.$uid.'.php','<?php return '.var_export($res,true).';');
         $token = $res['token'];
@@ -60,14 +70,42 @@ function setQrData(string $pwd,array $meta,string $text,$writeCode = false){
     $hash = md5($uc);
     $toEnrypt = $hash.' '.$uc; 
     $uid = getId();
-    $salt = ( current(explode(':',$pwd)) === 'RAW' ? '' : registerSalt($uid) );
-    $secret = $pwd.$salt;
-    return [
-            'uid'       => $uid,
-            'meta'      => explode(',',$meta),
-            'content'   => $secure->encode($uid,$pwd).' '.$secure->encode($toEnrypt,$secret),
-            'salt'      => $salt
-        ];
+    $securedUid = $secure->encode($uid,$pwd);
+    $tag = current(explode(':',$pwd));
+
+    if( $tag === 'RAW'  ){
+        $salt = '';
+        $secret = $pwd.$salt;
+        return [
+                'uid'       => $uid,
+                'meta'      => explode(',',$meta),
+                'content'   => $securedUid . ' ' . $secure->encode($toEnrypt,$secret),
+                'salt'      => $salt
+            ];
+    }else if( $tag === 'TOTP' ){
+        $salt = registerSalt($uid);
+        addDatToSalt($uid,'type','totp');
+        $seed = explode(':',$pwd);
+        $seed = end($seed);
+        addDatToSalt($uid,'seed',$seed);
+        $secret = $pwd.$salt;
+        return [
+                'uid'       => $uid,
+                'meta'      => explode(',',$meta),
+                'content'   => "$tag:$uid" . ' ' . $secure->encode($toEnrypt,$secret),
+                'salt'      => $salt
+            ];
+    }else{
+        $salt = registerSalt($uid);
+        addDatToSalt($uid,'type','regular');
+        $secret = $pwd.$salt;
+        return [
+                'uid'       => $uid,
+                'meta'      => explode(',',$meta),
+                'content'   => $securedUid . ' ' . $secure->encode($toEnrypt,$secret),
+                'salt'      => $salt
+            ];
+    }
 }
 
 function getQrData(string $pwd,string $raw){
@@ -75,8 +113,22 @@ function getQrData(string $pwd,string $raw){
         $err = 0;
         $name = $text = $content = null;
         $qrtext = explode(' ',$raw);
-        $uid = $secure->decode($qrtext[0],$pwd);
-        $salt = (current(explode(":",$pwd)) === 'RAW' ? '' : getRegisteredSalt($uid));
+        $uid = $qrtext[0];
+        $idType = current(explode(":",$qrtext[0]));
+        if($idType === 'TOTP'){
+            $uid = explode(":",$uid);
+            $uid = end($uid);
+            $salt = getRegisteredSalt($uid);
+            $seed = getDatForUid($uid,'seed');
+            $currentPass = trim(`oathtool --totp -b $seed`); // Point of injection
+            if($currentPass === $pwd){
+                $pwd = $idType.':'.$seed;
+            }
+        }else{
+             $uid = $secure->decode($qrtext[0],$pwd);
+        }
+        $tag = current(explode(":",$pwd));
+        $salt = ($tag === 'RAW' ? '' : getRegisteredSalt($uid));
         if($salt === false){
             $err = 2; // Unrekognized QR for this system.
         }else{

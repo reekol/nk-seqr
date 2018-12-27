@@ -175,14 +175,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     var strRand = async (type = 'hash') => {
-         let res = await fetch('api.php?rand=' + type)
+        let res = await fetch('api.php?rand=' + type)
              res = await res.json()
+        let qrSvg = document.getElementById('qrSvg');
              setCsrf(res.csrf)
-         if(typeof res.svg !== 'undefined') document.getElementById('qrSvg').innerHTML = ""
+         if(typeof res.svg !== 'undefined') qrSvg.innerHTML = ""
              + "<div class='alert alert-info m-0' >" + type + "</div>" 
              + res.svg
              + "<div class='alert alert-info' >Scan this code with Authentiation App!</div>";
+
+        let svg = qrSvg.querySelector('svg');
+            convert(svg,(canvas)=>{
+                qrSvg.href = canvas.toDataURL('image/png')
+                qrSvg.download=type + '2fa'
+            })
+
         return res.pwd;
+
             let text = "";
             let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             for (var i = 0; i < 4; i++) text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -300,8 +309,13 @@ function setLimit(limit){
 }
 
 function loading(mode = 'start'){
-        let content = document.getElementById('qrSvg').innerHTML;
-        document.getElementById('qrSvg').innerHTML = (mode == 'start'? '<div class="lds-ripple mt-2"><div></div><div></div></div>': content)
+        let load = '<div class="lds-ripple mt-2"><div></div><div></div></div>'
+        if( mode === 'start'){
+            document.getElementById('qrSvg').innerHTML = load
+        }else{
+            let content = document.getElementById('qrSvg').innerHTML;
+            document.getElementById('qrSvg').innerHTML  = (content === load ? '' : content)
+        }
 }
 
 function formSubmit(form){
@@ -328,7 +342,7 @@ function setResponse(response){
 
         if(typeof response.txt !== 'undefined' && response.txt !== null) nn.value = response.txt
         if(typeof response.nme !== 'undefined' && response.nme !== null) n.value = response.nme.replace('.qr.png','');
-        if(typeof response.err !== 'undefined' && response.err > 0) err.innerHTML ='<div class="alert alert-danger m-0 mt-2"><i class="fas fa-spider"></i>&nbsp;' + ERRORS[response.err] + '</div>'
+        if(typeof response.err !== 'undefined' && response.err > 0) err.innerHTML ='<div class="alert alert-danger m-0 mt-2"><i class="fas fa-spider"></i>&nbsp;' + ERRORS[response.err] + '<br />' + response.raw + '</div>'
         if(typeof response.rec !== 'undefined' && response.rec !== '') rec.innerHTML ='<div class="alert alert-info m-0 mt-2"><i class="fas fa-recycle"></i>&nbsp;' + response.rec + '</div>'
 //        if(typeof response.uid !== 'undefined' && response.uid !== '') uid.innerHTML ='<div class="alert alert-success m-0 mt-2"><i class="fas fa-fingerprint"></i>&nbsp;' + response.uid + '</div>'
         if(typeof response.svg !== 'undefined' && response.svg !== null)

@@ -46,6 +46,7 @@ if(!isset($OUT['err'])){
                 "txt" => $data['text'],
                 "nme" => $data['name'],
                 "err" => $data['err'],
+                "raw" => $raw,
                 "svg" => generateQr($raw),
             ];
         }
@@ -55,19 +56,19 @@ if(!isset($OUT['err'])){
     **/
         $rend = trim($_REQUEST['rand']);
         sleep(1);
-             if($_REQUEST['rand'] === 'word') $OUT['pwd'] = `shuf -n 1 /usr/share/dict/words`;
+             if($_REQUEST['rand'] === 'word') $OUT['pwd'] = trim(`shuf -n 1 /usr/share/dict/words`);
         else if($_REQUEST['rand'] === 'hash') $OUT['pwd'] = bin2hex(random_bytes(4));
         else if($_REQUEST['rand'] === 'totp'){
             $seed = bin2hex(random_bytes(15));
             $secret = trim(`oathtool --totp -v $seed | grep Base32 | cut -d ' ' -f3`);
-            $OUT['pwd'] = 'totp:'.$seed;
-            $OUT['svg'] = generateQr("otpauth://totp/secret@seqr.link?secret={$secret}");
+            $OUT['pwd'] = 'TOTP:'.$secret; // Base32 version of the seed.
+            $OUT['svg'] = generateQr("otpauth://totp/web@seqr.link?secret={$secret}");
         }
         else if($_REQUEST['rand'] === 'hotp'){
             $seed = bin2hex(random_bytes(15));
             $secret = trim(`oathtool --hotp -v $seed | grep Base32 | cut -d ' ' -f3`);
-            $OUT['pwd'] = 'hotp:'.$seed;
-            $OUT['svg'] = generateQr("otpauth://hotp/secret@seqr.link?secret={$secret}");
+            $OUT['pwd'] = 'HOTP:'.$seed;
+            $OUT['svg'] = generateQr("otpauth://hotp/web@seqr.link?secret={$secret}");
         }
     }else if(isset($_REQUEST['doc'])){
     /**
