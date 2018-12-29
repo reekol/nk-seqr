@@ -214,11 +214,24 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     nc.addEventListener('click',changeCb);
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-toggle="tooltip"]').tooltip();
 
 //    passUp();
 
 });
+
+function markdown(md){
+    return ("\n" + md)
+            .replace(/\ https:\/\/(.*)\n/g,'&nbsp<a href="//$1">$1</a>\n')
+            .replace(/\n###(.*?)\n/g,'\n<h6>$1</h6>\n')
+            .replace(/\n##(.*?)\n/g,'\n<h4>$1</h4>\n')
+            .replace(/\n#(.*?)\n/g,'\n<h1>$1</h1>\n')
+            .replace(/\n-(.*?)\n/g,'\n<ul><li>$1</li></ul>\n')
+            .split("```\n").join('</code>\n')
+            .split("```").join('<code>')
+            .replace('<code>bash','<code>')
+            .replace('<code>','<code style="display:block;border:1px solid #cdcdcd !important;border-radius:4px;padding:4px;margin:4px !important">')
+}
 
 function togglePassVis() {
     let x = document.getElementById('fp');

@@ -7,7 +7,8 @@
 
 ### To install dependencies
 ```bash
-apt-get install zbar-tools qrencode wamerican
+apt-get install zbar-tools qrencode wamerican imagemagick oathool
+
 ```
 ### Default credentials
 - Basic auth: admin/admn123

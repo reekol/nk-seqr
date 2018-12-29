@@ -6,6 +6,11 @@ class secure{
     public  function decode($o,$p){ return openssl_decrypt( $o , $this->alg, $p, false); }
 }
 
+function filter(string $type,string $var){
+    if($type === 'alphaNum') return preg_replace('/[^a-zA-Z0-9]/', '_', $var);
+    return false;
+}
+
 function getRegisteredSalt($uid,$full = false){
     $file = './../salts/uid-'.$uid.'.php';
     if(file_exists($file)){
@@ -86,7 +91,7 @@ function setQrData(string $pwd,array $meta,string $text,$writeCode = false){
         $salt = registerSalt($uid);
         addDatToSalt($uid,'type','totp');
         $seed = explode(':',$pwd);
-        $seed = end($seed);
+        $seed = filter('alphaNum',end($seed));
         addDatToSalt($uid,'seed',$seed);
         $secret = $pwd.$salt;
         return [
@@ -120,6 +125,7 @@ function getQrData(string $pwd,string $raw){
             $uid = end($uid);
             $salt = getRegisteredSalt($uid);
             $seed = getDatForUid($uid,'seed');
+            $seed = filter('alphaNum',$seed);
             $currentPass = trim(`oathtool --totp -b $seed`); // Point of injection
             if($currentPass === $pwd){
                 $pwd = $idType.':'.$seed;

@@ -79,6 +79,8 @@ if(!isset($OUT['err'])){
         $OUT['res'] = $_SERVER['REMOTE_ADDR'];
     }else if(isset($_REQUEST['return']) && $_REQUEST['return'] === 'server'){
         $OUT['res'] = getallheaders();
+    }else if(isset($_REQUEST['return']) && $_REQUEST['return'] === 'ls'){
+        $OUT['readme'] = `ls ../salts | sed 's/.php//g'`;
     }
 }
 
