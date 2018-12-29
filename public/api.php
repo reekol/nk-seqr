@@ -2,7 +2,7 @@
 
 /** 
     Depends on zbar-tools and qrencode wamerican
-    To install$ apt-get install zbar-tools qrencode wamerican imagemagick
+    To install$ apt-get install zbar-tools qrencode wamerican imagemagick oathool
 **/
 
 include('../php/init.php'); /// Settings and globals
@@ -46,6 +46,7 @@ if(!isset($OUT['err'])){
                 "txt" => $data['text'],
                 "nme" => $data['name'],
                 "err" => $data['err'],
+                "raw" => $raw,
                 "svg" => generateQr($raw),
             ];
         }
@@ -53,8 +54,22 @@ if(!isset($OUT['err'])){
     /**
         Generating randomness
     **/
+        $rend = trim($_REQUEST['rand']);
         sleep(1);
-        $OUT['pwd'] = trim($_REQUEST['rand'] === 'word' ? `shuf -n 1 /usr/share/dict/words` : bin2hex(random_bytes(4)));
+             if($_REQUEST['rand'] === 'word') $OUT['pwd'] = trim(`shuf -n 1 /usr/share/dict/words`);
+        else if($_REQUEST['rand'] === 'hash') $OUT['pwd'] = bin2hex(random_bytes(4));
+        else if($_REQUEST['rand'] === 'totp'){
+            $seed = bin2hex(random_bytes(15));
+            $secret = trim(`oathtool --totp -v $seed | grep Base32 | cut -d ' ' -f3`);
+            $OUT['pwd'] = 'TOTP:'.$secret; // Base32 version of the seed.
+            $OUT['svg'] = generateQr("otpauth://totp/web@seqr.link?secret={$secret}");
+        }
+        else if($_REQUEST['rand'] === 'hotp'){
+            $seed = bin2hex(random_bytes(15));
+            $secret = trim(`oathtool --hotp -v $seed | grep Base32 | cut -d ' ' -f3`);
+            $OUT['pwd'] = 'HOTP:'.$seed;
+            $OUT['svg'] = generateQr("otpauth://hotp/web@seqr.link?secret={$secret}");
+        }
     }else if(isset($_REQUEST['doc'])){
     /**
         GETTING README.md
@@ -64,6 +79,8 @@ if(!isset($OUT['err'])){
         $OUT['res'] = $_SERVER['REMOTE_ADDR'];
     }else if(isset($_REQUEST['return']) && $_REQUEST['return'] === 'server'){
         $OUT['res'] = getallheaders();
+    }else if(isset($_REQUEST['return']) && $_REQUEST['return'] === 'ls'){
+        $OUT['readme'] = `ls ../salts | sed 's/.php//g'`;
     }
 }
 

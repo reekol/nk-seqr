@@ -1,4 +1,4 @@
-var textMax = suffix = pr = pd = fp = nn = nc = cm = cf = fu = mf = er = hash = n = null;
+var textMax = suffix = pr = totp = hotp = pd = fp = nn = nc = cm = cf = fu = mf = er = hash = n = null;
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -119,6 +119,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     mf = document.getElementById('camFile');
     tp = document.getElementById('togglePassVis');
     er = document.getElementById('eraser');
+    totp = document.getElementById('passTotp');
+    hotp = document.getElementById('passHotp');
 
     let res = await fetch('api.php')
         res = await res.json()
@@ -154,9 +156,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     fp.addEventListener('keyup',passUp);
 
     pd.addEventListener('click',(e) => { fp.value = 'RAW:default'; passUp() });
-    pr.addEventListener('click',async (e) => { 
+    pr.addEventListener('click',(e) => { getpass('word') });
+    totp.addEventListener('click',(e) => { getpass('totp') });
+    hotp.addEventListener('click',(e) => { getpass('hotp') });
+
+    var getpass = async (type) => {
         loading('start')
-        fp.value = await strRand();
+        fp.value = await strRand(type);
         loading('end')
         passUp()
         let x = document.getElementById('fp');
@@ -166,13 +172,26 @@ document.addEventListener('DOMContentLoaded', async function () {
         y.classList.add('fa-eye-slash')
         fp.select();
         document.execCommand('copy');
-    });
+    }
 
-    var strRand = async () => {
-         let res = await fetch('api.php?rand=word')
+    var strRand = async (type = 'hash') => {
+        let res = await fetch('api.php?rand=' + type)
              res = await res.json()
+        let qrSvg = document.getElementById('qrSvg');
              setCsrf(res.csrf)
+         if(typeof res.svg !== 'undefined') qrSvg.innerHTML = ""
+             + "<div class='alert alert-info m-0' >" + type + "</div>" 
+             + res.svg
+             + "<div class='alert alert-info' >Scan this code with Authentiation App!</div>";
+
+        let svg = qrSvg.querySelector('svg');
+            convert(svg,(canvas)=>{
+                qrSvg.href = canvas.toDataURL('image/png')
+                qrSvg.download=type + '2fa'
+            })
+
         return res.pwd;
+
             let text = "";
             let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             for (var i = 0; i < 4; i++) text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -195,11 +214,24 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     nc.addEventListener('click',changeCb);
-    $('[data-toggle="tooltip"]').tooltip()
+    $('[data-toggle="tooltip"]').tooltip();
 
 //    passUp();
 
 });
+
+function markdown(md){
+    return ("\n" + md)
+            .replace(/\ https:\/\/(.*)\n/g,'&nbsp<a href="//$1">$1</a>\n')
+            .replace(/\n###(.*?)\n/g,'\n<h6>$1</h6>\n')
+            .replace(/\n##(.*?)\n/g,'\n<h4>$1</h4>\n')
+            .replace(/\n#(.*?)\n/g,'\n<h1>$1</h1>\n')
+            .replace(/\n-(.*?)\n/g,'\n<ul><li>$1</li></ul>\n')
+            .split("```\n").join('</code>\n')
+            .split("```").join('<code>')
+            .replace('<code>bash','<code>')
+            .replace('<code>','<code style="display:block;border:1px solid #cdcdcd !important;border-radius:4px;padding:4px;margin:4px !important">')
+}
 
 function togglePassVis() {
     let x = document.getElementById('fp');
@@ -290,7 +322,13 @@ function setLimit(limit){
 }
 
 function loading(mode = 'start'){
-        document.getElementById('qrSvg').innerHTML = (mode == 'start'? '<div class="lds-ripple mt-2"><div></div><div></div></div>': '')
+        let load = '<div class="lds-ripple mt-2"><div></div><div></div></div>'
+        if( mode === 'start'){
+            document.getElementById('qrSvg').innerHTML = load
+        }else{
+            let content = document.getElementById('qrSvg').innerHTML;
+            document.getElementById('qrSvg').innerHTML  = (content === load ? '' : content)
+        }
 }
 
 function formSubmit(form){
@@ -317,7 +355,7 @@ function setResponse(response){
 
         if(typeof response.txt !== 'undefined' && response.txt !== null) nn.value = response.txt
         if(typeof response.nme !== 'undefined' && response.nme !== null) n.value = response.nme.replace('.qr.png','');
-        if(typeof response.err !== 'undefined' && response.err > 0) err.innerHTML ='<div class="alert alert-danger m-0 mt-2"><i class="fas fa-spider"></i>&nbsp;' + ERRORS[response.err] + '</div>'
+        if(typeof response.err !== 'undefined' && response.err > 0) err.innerHTML ='<div class="alert alert-danger m-0 mt-2"><i class="fas fa-spider"></i>&nbsp;' + ERRORS[response.err] + '<br />' + response.raw + '</div>'
         if(typeof response.rec !== 'undefined' && response.rec !== '') rec.innerHTML ='<div class="alert alert-info m-0 mt-2"><i class="fas fa-recycle"></i>&nbsp;' + response.rec + '</div>'
 //        if(typeof response.uid !== 'undefined' && response.uid !== '') uid.innerHTML ='<div class="alert alert-success m-0 mt-2"><i class="fas fa-fingerprint"></i>&nbsp;' + response.uid + '</div>'
         if(typeof response.svg !== 'undefined' && response.svg !== null)
