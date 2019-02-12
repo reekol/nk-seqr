@@ -15,7 +15,7 @@ apt-get install zbar-tools qrencode wamerican imagemagick oathool
 
 ### Safety
 
-- The safest method is to provide password. Then server creaates a salt to it and image can be decrypted only combining both of then, and can be invalidated when salt is deleted.
+- The safest method is to provide password. Then server creaates a salt to it and image can be decrypted only combining both of them, and can be invalidated when salt is deleted.
 
 - OTP method ( TOTP ) is less safe, because it's seed exists in both, server and cient.
 
