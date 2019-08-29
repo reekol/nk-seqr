@@ -21,7 +21,7 @@ if(!isset($OUT['err'])){
 //                addDatToSalt($data['uid'],'encrypted',$data['content']);
         $OUT = [
             "uid" => $data['uid'],
-            "nme"=>$data['meta'][0],
+            "nme" =>$data['meta'][0],
             "svg" => generateQr($data['content'], (int) $_REQUEST['correction'], (int) $_REQUEST['margin']),
             "rec" => $data['salt']
         ];
@@ -69,6 +69,9 @@ if(!isset($OUT['err'])){
             $secret = trim(`oathtool --hotp -v $seed | grep Base32 | cut -d ' ' -f3`);
             $OUT['pwd'] = 'HOTP:'.$seed;
             $OUT['svg'] = generateQr("otpauth://hotp/web@seqr.link?secret={$secret}");
+        }
+        else if($_REQUEST['rand'] === 'bomb'){
+            $OUT['pwd'] = 'BOMB:1';
         }
     }else if(isset($_REQUEST['doc'])){
     /**

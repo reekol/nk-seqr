@@ -100,6 +100,20 @@ function setQrData(string $pwd,array $meta,string $text,$writeCode = false){
                 'content'   => "$tag:$uid" . ' ' . $secure->encode($toEnrypt,$secret),
                 'salt'      => $salt
             ];
+    }else if( $tag === 'BOMB' ){
+        $salt = registerSalt($uid);
+        addDatToSalt($uid,'type','bomb');
+        $seed = explode(':',$pwd);
+        $secret = $pwd.$salt;
+        $encrypted = $secure->encode($toEnrypt,$secret);
+        addDatToSalt($uid,'times',(int) (end($seed)));
+        addDatToSalt($uid,'content',$encrypted);
+        return [
+                'uid'       => $uid,
+                'meta'      => explode(',',$meta),
+                'content'   => "$tag:$uid" . ' ' . $encrypted,
+                'salt'      => $salt
+            ];
     }else{
         $salt = registerSalt($uid);
         addDatToSalt($uid,'type','regular');

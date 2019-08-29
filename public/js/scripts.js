@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     }
     pr = document.getElementById('passRandom');
+    pb = document.getElementById('passBomb');
     pd = document.getElementById('passDefault');
     fu = document.getElementById('fup');
     fp = document.getElementById('fp');
@@ -155,8 +156,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     nn.addEventListener('keyup',nnUp);
     fp.addEventListener('keyup',passUp);
 
-    pd.addEventListener('click',(e) => { fp.value = 'RAW:default'; passUp() });
-    pr.addEventListener('click',(e) => { getpass('word') });
+    pd  .addEventListener('click',(e) => { fp.value = 'RAW:default'; passUp() });
+    pr  .addEventListener('click',(e) => { getpass('word') });
+    pb  .addEventListener('click',(e) => { getpass('bomb') });
     totp.addEventListener('click',(e) => { getpass('totp') });
     hotp.addEventListener('click',(e) => { getpass('hotp') });
 
