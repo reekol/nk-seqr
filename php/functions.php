@@ -106,12 +106,14 @@ function setQrData(string $pwd,array $meta,string $text,$writeCode = false){
         $seed = explode(':',$pwd);
         $secret = $pwd.$salt;
         $encrypted = $secure->encode($toEnrypt,$secret);
+        $url = 'http://seqr.link/#'.$uid;
         addDatToSalt($uid,'times',(int) (end($seed)));
         addDatToSalt($uid,'content',$encrypted);
         return [
                 'uid'       => $uid,
+                'url'       => $url,
                 'meta'      => explode(',',$meta),
-                'content'   => "$tag:$uid" . ' ' . $encrypted,
+                'content'   => $url,
                 'salt'      => $salt
             ];
     }else{

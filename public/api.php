@@ -21,6 +21,7 @@ if(!isset($OUT['err'])){
 //                addDatToSalt($data['uid'],'encrypted',$data['content']);
         $OUT = [
             "uid" => $data['uid'],
+            "url" => isset($data['url']) ? $data['url'] : '',
             "nme" =>$data['meta'][0],
             "svg" => generateQr($data['content'], (int) $_REQUEST['correction'], (int) $_REQUEST['margin']),
             "rec" => $data['salt']

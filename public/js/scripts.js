@@ -359,16 +359,17 @@ function setResponse(response){
         if(typeof response.nme !== 'undefined' && response.nme !== null) n.value = response.nme.replace('.qr.png','');
         if(typeof response.err !== 'undefined' && response.err > 0) err.innerHTML ='<div class="alert alert-danger m-0 mt-2"><i class="fas fa-spider"></i>&nbsp;' + ERRORS[response.err] + '<br />' + response.raw + '</div>'
         if(typeof response.rec !== 'undefined' && response.rec !== '') rec.innerHTML ='<div class="alert alert-info m-0 mt-2"><i class="fas fa-recycle"></i>&nbsp;' + response.rec + '</div>'
-//        if(typeof response.uid !== 'undefined' && response.uid !== '') uid.innerHTML ='<div class="alert alert-success m-0 mt-2"><i class="fas fa-fingerprint"></i>&nbsp;' + response.uid + '</div>'
+        if(typeof response.url !== 'undefined' && response.url !== '') rec.innerHTML ='<div class="alert alert-info m-0 mt-2"><i class="fas fa-recycle"></i>&nbsp;' + response.url + '</div>'
+//      if(typeof response.uid !== 'undefined' && response.uid !== '') uid.innerHTML ='<div class="alert alert-success m-0 mt-2"><i class="fas fa-fingerprint"></i>&nbsp;' + response.uid + '</div>'
         if(typeof response.svg !== 'undefined' && response.svg !== null)
         {
             qrSvg.innerHTML = response.svg;
             let svg = qrSvg.querySelector('svg');
-//                svg.innerHTML += `<text font-size="6" x="10" y="7" fill="red">${response.rec}</text>`
+//              svg.innerHTML += `<text font-size="6" x="10" y="7" fill="red">${response.rec}</text>`
             convert(svg,(canvas)=>{
                 qrSvg.href = canvas.toDataURL('image/png')
                 qrSvg.download=response.nme
-//                window.location.hash= (typeof response.uid === 'undefined' ? '' : response.uid )
+//              window.location.hash= (typeof response.uid === 'undefined' ? '' : response.uid )
             })
         }
 }
