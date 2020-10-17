@@ -1,4 +1,4 @@
-var textMax = suffix = pr = totp = hotp = pd = fp = nn = nc = cm = cf = fu = mf = er = hash = n = null;
+var textMax = suffix = pr = totp = hotp = pd = pn = fp = nn = nc = cm = cf = fu = mf = er = hash = n = null;
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     }
     pr = document.getElementById('passRandom');
+    pn = document.getElementById('passNfc');
     pb = document.getElementById('passBomb');
     pd = document.getElementById('passDefault');
     fu = document.getElementById('fup');
@@ -155,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     nn.addEventListener('keyup',nnUp);
     fp.addEventListener('keyup',passUp);
-
+    
     pd  .addEventListener('click',(e) => { fp.value = 'RAW:default'; passUp() });
     pr  .addEventListener('click',(e) => { getpass('word') });
     pb  .addEventListener('click',(e) => { getpass('bomb') });
@@ -215,12 +216,30 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     };
 
+    let readNfc = async () => {
+      try {
+        const reader = new NDEFReader()
+        await reader.scan()
+        console.log("> Scan started")
+        reader.addEventListener("error", (event) => { console.log(`Argh! ${event.message}`) })
+        reader.addEventListener("reading", ({ message, serialNumber }) => {
+          console.log(`> Serial Number: ${serialNumber}`)
+//          console.log(`> Records: (${message.records.length})`)
+          fp.value = serialNumber
+          console.log('> passUp')
+          passUp()
+
+          
+        })
+      } catch (error) { console.log("Argh! " + error) }
+    }
+
+    pn.addEventListener('click',readNfc);
     nc.addEventListener('click',changeCb);
     $('[data-toggle="tooltip"]').tooltip();
 
 //    passUp();
-
-});
+})
 
 function markdown(md){
     return ("\n" + md)
@@ -373,3 +392,4 @@ function setResponse(response){
             })
         }
 }
+
