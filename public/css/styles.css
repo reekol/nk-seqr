@@ -8,6 +8,10 @@
     display:none
 }
 
+#passNfc svg{
+  width:23px;
+  height:23px; 
+}
 
 .range {
 
@@ -47,7 +51,7 @@
 }
 
 
-svg{
+a svg{
     width:100% !important;
     height:100% !important;
     position:reative;
@@ -195,3 +199,4 @@ input:checked + .slider {
 }
 
 /* end spinner */
+

@@ -217,21 +217,27 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     let readNfc = async () => {
+      loading('start')
       try {
         const reader = new NDEFReader()
         await reader.scan()
         console.log("> Scan started")
-        reader.addEventListener("error", (event) => { console.log(`Argh! ${event.message}`) })
+        reader.addEventListener("error", (event) => { 
+          console.log(`Argh! ${event.message}`) 
+          loading('end')
+        })
         reader.addEventListener("reading", ({ message, serialNumber }) => {
           console.log(`> Serial Number: ${serialNumber}`)
-//          console.log(`> Records: (${message.records.length})`)
+          console.log(`> Records: (${message.records.length})`)
           fp.value = serialNumber
-          console.log('> passUp')
           passUp()
-
+          loading('end')
           
         })
-      } catch (error) { console.log("Argh! " + error) }
+      } catch (error) { 
+        loading('end')
+        console.log("Argh! " + error)
+      }
     }
 
     pn.addEventListener('click',readNfc);
